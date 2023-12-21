@@ -35,7 +35,7 @@
         "symfony/flex": "^2",
         "symfony/framework-bundle": "*",
         "symfony/monolog-bundle": "^3.10",
-        "symfony/runtime": "7.*",
+        "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "*",
         "symfony/yaml": "7.*",
         "willdurand/hateoas-bundle": "^2.5"
@@ -110,7 +110,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "6.4.*",
             "docker": false
         }
