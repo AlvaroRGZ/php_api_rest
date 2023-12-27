@@ -33,10 +33,10 @@ interface ApiResultsCommandInterface
 
     /**
      * **DELETE** Action<br>
-     * Summary: Removes the User resource.<br>
-     * _Notes_: Deletes the user identified by &#x60;userId&#x60;.
+     * Summary: Removes the Result resource.<br>
+     * _Notes_: Deletes the result identified by &#x60;resultId&#x60;.
      *
-     * @param int $userId User id
+     * @param int $resultId Result id
      */
-    public function deleteAction(Request $request, int $userId): Response;
+    public function deleteAction(Request $request, int $resultId): Response;
 }

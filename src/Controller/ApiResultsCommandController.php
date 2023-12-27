@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Result;
 use App\Entity\User;
 use App\Utility\Utils;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,7 +39,7 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
      * @see ApiResultsCommandInterface::deleteAction()
      *
      * @Route(
-     *     path="/{userId}.{_format}",
+     *     path="/{resultId}.{_format}",
      *     defaults={ "_format": null },
      *     requirements={
      *          "resultId": "\d+",
@@ -48,7 +49,7 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
      *     name="delete"
      * )
      */
-    public function deleteAction(Request $request, int $userId): Response
+    public function deleteAction(Request $request, int $resultId): Response
     {
         $format = Utils::getFormat($request);
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
@@ -67,16 +68,16 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
             );
         }
 
-        /** @var User $user */
-        $user = $this->entityManager
-            ->getRepository(User::class)
-            ->find($userId);
+        /** @var Result $result */
+        $result = $this->entityManager
+            ->getRepository(Result::class)
+            ->find($resultId);
 
-        if (!$user instanceof User) {   // 404 - Not Found
+        if (!$result instanceof Result) {   // 404 - Not Found
             return Utils::errorMessage(Response::HTTP_NOT_FOUND, null, $format);
         }
 
-        $this->entityManager->remove($user);
+        $this->entityManager->remove($result);
         $this->entityManager->flush();
 
         return Utils::apiResponse(Response::HTTP_NO_CONTENT);
