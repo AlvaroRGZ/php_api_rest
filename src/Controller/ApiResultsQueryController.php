@@ -94,10 +94,10 @@ class ApiResultsQueryController extends AbstractController implements ApiResults
      * @see ApiResultsQueryInterface::getAction()
      *
      * @Route(
-     *     path="/{userId}.{_format}",
+     *     path="/{resultId}.{_format}",
      *     defaults={ "_format": null },
      *     requirements={
-     *          "userId": "\d+",
+     *          "resultId": "\d+",
      *          "_format": "json|xml"
      *     },
      *     methods={ Request::METHOD_GET },
@@ -106,7 +106,7 @@ class ApiResultsQueryController extends AbstractController implements ApiResults
      *
      * @throws JsonException
      */
-    public function getAction(Request $request, int $userId): Response
+    public function getAction(Request $request, int $resultId): Response
     {
         $format = Utils::getFormat($request);
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
@@ -117,24 +117,24 @@ class ApiResultsQueryController extends AbstractController implements ApiResults
             );
         }
 
-        /** @var User $user */
-        $user = $this->entityManager
-            ->getRepository(User::class)
-            ->find($userId);
+        /** @var Result $result */
+        $result = $this->entityManager
+            ->getRepository(Result::class)
+            ->find($resultId);
 
-        if (!$user instanceof User) {
+        if (!$result instanceof Result) {
             return Utils::errorMessage(Response::HTTP_NOT_FOUND, null, $format);    // 404
         }
 
         // Caching with ETag (password included)
-        $etag = md5(json_encode($user, JSON_THROW_ON_ERROR) . $user->getPassword());
+        $etag = md5(json_encode($result, JSON_THROW_ON_ERROR) . $result->getUser()->getPassword());
         if (($etags = $request->getETags()) && (in_array($etag, $etags) || in_array('*', $etags))) {
             return new Response(null, Response::HTTP_NOT_MODIFIED); // 304
         }
 
         return Utils::apiResponse(
             Response::HTTP_OK,
-            [ User::USER_ATTR => $user ],
+            [ Result::RESULT_ATTR => $result ],
             $format,
             [
                 self::HEADER_CACHE_CONTROL => 'private',
