@@ -107,7 +107,7 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
                 $format
             );
         }
-        // Puede crear un usuario sólo si tiene ROLE_ADMIN
+        // Puede crear un resultado sólo si tiene ROLE_ADMIN
         if (!$this->isGranted(self::ROLE_ADMIN)) {
             return Utils::errorMessage( // 403
                 Response::HTTP_FORBIDDEN,
@@ -118,44 +118,38 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
         $body = $request->getContent();
         $postData = json_decode((string) $body, true, 512, JSON_THROW_ON_ERROR);
 
-        if (!isset($postData[User::EMAIL_ATTR], $postData[User::PASSWD_ATTR])) {
+        if (!isset($postData[Result::RESULT_ATTR], $postData[Result::USER_ATTR], $postData[Result::DATE_ATTR])) {
             // 422 - Unprocessable Entity -> Faltan datos
             return Utils::errorMessage(Response::HTTP_UNPROCESSABLE_ENTITY, null, $format);
         }
 
         // hay datos -> procesarlos
-        $user_exist = $this->entityManager
+        $user = $this->entityManager
                 ->getRepository(User::class)
-                ->findOneBy([ User::EMAIL_ATTR => $postData[User::EMAIL_ATTR] ]);
+                ->find($postData[Result::USER_ATTR]);
 
-        if ($user_exist instanceof User) {    // 400 - Bad Request
+        if (!($user instanceof User)) {    // 400 - Bad Request
             return Utils::errorMessage(Response::HTTP_BAD_REQUEST, null, $format);
         }
 
         // 201 - Created
-        $user = new User(
-            strval($postData[User::EMAIL_ATTR]),
-            strval($postData[User::PASSWD_ATTR])
-        );
-        // hash the password (based on the security.yaml config for the $user class)
-        $hashedPassword = $this->passwordHasher->hashPassword(
+        $result = new Result(
+            strval($postData[Result::RESULT_ATTR]),
             $user,
-            strval($postData[User::PASSWD_ATTR])
+            new \DateTime(strval($postData[Result::DATE_ATTR]))
+            // Default created Date
         );
-        $user->setPassword($hashedPassword);
-        // roles
-        (!isset($postData[User::ROLES_ATTR])) ?: $user->setRoles($postData[User::ROLES_ATTR]);
 
-        $this->entityManager->persist($user);
+        $this->entityManager->persist($result);
         $this->entityManager->flush();
 
         return Utils::apiResponse(
             Response::HTTP_CREATED,
-            [ User::USER_ATTR => $user ],
+            [ Result::RESULT_ATTR => $result ],
             $format,
             [
                 'Location' => $request->getScheme() . '://' . $request->getHttpHost() .
-                    ApiUsersQueryInterface::RUTA_API . '/' . $user->getId(),
+                    ApiResultsQueryInterface::RUTA_API . '/' . $result->getId(),
             ]
         );
     }

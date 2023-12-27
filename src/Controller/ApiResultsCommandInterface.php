@@ -24,12 +24,12 @@ interface ApiResultsCommandInterface
     /**
      * **PUT** action<br>
      * Summary: Updates the Result resource.<br>
-     * _Notes_: Updates the Result identified by &#x60;_userId_&#x60;.
+     * _Notes_: Updates the Result identified by &#x60;_resultId_&#x60;.
      *
      * @param Request $request request
-     * @param int $userId User id
+     * @param int $resultId Result id
      */
-    public function putAction(Request $request, int $userId): Response;
+    public function putAction(Request $request, int $resultId): Response;
 
     /**
      * **DELETE** Action<br>
