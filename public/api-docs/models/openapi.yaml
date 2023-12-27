@@ -28,6 +28,8 @@ tags:
     description: 'User login'
   - name: '👥 Users'
     description: 'User management'
+  - name: '🔢 Results'
+    description: 'Result management'
 paths:
   /login_check:
     post:
@@ -220,6 +222,33 @@ paths:
             Allow:
               $ref: '#/components/headers/Allow'
 
+  /results:
+    get:
+      tags: [ '🔢 Results' ]
+      summary: Retrieves the collection of Result resources.
+      description: 'Returns all results from the system that the user has access to.'
+      operationId: api_results_cget
+      security:
+        - MiWApiSecurity: [ ]
+      responses:
+        '200':
+          description: 'Array of results'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results: { description: 'Results array', type: array, items: { $ref: '#/components/schemas/Result' } }
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '401':
+          $ref: '#/components/responses/401_Unauthorized_Response'
+        '403':
+          $ref: '#/components/responses/403_Forbidden_Response'
+        '404':
+          $ref: '#/components/responses/404_Resource_Not_Found_Response'
+
 components:
   headers:
     ETag:
@@ -268,6 +297,51 @@ components:
               href: /api/v1/users
             self:
               href: /api/v1/users/1508
+    Result:
+      type: object
+      properties:
+        id:
+          description: 'Result Id'
+          type: integer
+          format: int64
+        user:
+          description: 'User'
+          type: User
+          format: json
+        result:
+          description: 'result'
+          type: integer
+          format: json
+        date:
+          description: 'date'
+          type: DateTime
+          format: DateTime
+        _links:
+          description: link relations
+          type: object
+          properties:
+            parent:
+              type: object
+              properties: { "href": { "type": "string", "format": "url" } }
+            self:
+              type: object
+              properties: { "href": { "type": "string", "format": "url" } }
+      example:
+        user:
+          id: 5235
+          user:
+            id: 1244
+            user:
+              id: 1508
+              email: 'miw.etsisi@upm.es'
+              roles: [ 'ROLE_USER' ]
+              _links:
+                parent:
+                  href: /api/v1/users
+                self:
+                  href: /api/v1/users/1508
+          result: 450
+          date: 2013-06-23
     Message:
       type: object
       description: HTTP response message
