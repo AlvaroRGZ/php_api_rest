@@ -144,22 +144,22 @@ class ApiResultsQueryController extends AbstractController implements ApiResults
     }
 
     /**
-     * @see ApiUsersQueryInterface::optionsAction()
+     * @see ApiResultsQueryInterface::optionsAction()
      *
      * @Route(
-     *     path="/{userId}.{_format}",
-     *     defaults={ "userId" = 0, "_format": "json" },
+     *     path="/{resultId}.{_format}",
+     *     defaults={ "resultId" = 0, "_format": "json" },
      *     requirements={
-     *          "userId": "\d+",
+     *          "resultId": "\d+",
      *         "_format": "json|xml"
      *     },
      *     methods={ Request::METHOD_OPTIONS },
      *     name="options"
      * )
      */
-    public function optionsAction(int|null $userId): Response
+    public function optionsAction(int|null $resultId): Response
     {
-        $methods = $userId !== 0
+        $methods = $resultId !== 0
             ? [ Request::METHOD_GET, Request::METHOD_PUT, Request::METHOD_DELETE ]
             : [ Request::METHOD_GET, Request::METHOD_POST ];
         $methods[] = Request::METHOD_OPTIONS;
