@@ -155,13 +155,13 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
     }
 
     /**
-     * @see ApiUsersCommandInterface::putAction()
+     * @see ApiResultsCommandInterface::putAction()
      *
      * @Route(
-     *     path="/{userId}.{_format}",
+     *     path="/{resultId}.{_format}",
      *     defaults={ "_format": null },
      *     requirements={
-     *          "userId": "\d+",
+     *          "resultId": "\d+",
      *         "_format": "json|xml"
      *     },
      *     methods={ Request::METHOD_PUT },
@@ -169,7 +169,7 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
      * )
      * @throws JsonException
      */
-    public function putAction(Request $request, int $userId): Response
+    public function putAction(Request $request, int $resultId): Response
     {
         $format = Utils::getFormat($request);
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
@@ -179,11 +179,20 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
                 $format
             );
         }
+        // Comprobar si es el mismo usuario del resultado o es admin
+        $result = $this->entityManager
+            ->getRepository(Result::class)
+            ->find($resultId);
+
+        if (!$result instanceof Result) {    // 404 - Not Found
+            return Utils::errorMessage(Response::HTTP_NOT_FOUND, null, $format);
+        }
+
         // Puede editar otro usuario diferente sólo si tiene ROLE_ADMIN
         /** @var User $user */
         $user = $this->getUser();
         if (
-            ($user->getId() !== $userId)
+            ($user->getId() !== $result->getUser()->getId())
             && !$this->isGranted(self::ROLE_ADMIN)
         ) {
             return Utils::errorMessage( // 403
@@ -194,16 +203,7 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
         }
         $body = (string) $request->getContent();
         $postData = json_decode($body, true);
-
-        /** @var User $user */
-        $user = $this->entityManager
-            ->getRepository(User::class)
-            ->find($userId);
-
-        if (!$user instanceof User) {    // 404 - Not Found
-            return Utils::errorMessage(Response::HTTP_NOT_FOUND, null, $format);
-        }
-
+        /*
         // Optimistic Locking (strong validation, password included)
         $etag = md5(json_encode($user, JSON_THROW_ON_ERROR) . $user->getPassword());
         if (!$request->headers->has('If-Match') || $etag != $request->headers->get('If-Match')) {
@@ -213,48 +213,33 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
                 $format
             ); // 412
         }
-
-        if (isset($postData[User::EMAIL_ATTR])) {
+        */
+        if (isset($postData[Result::USER_ATTR])) {
             $user_exist = $this->entityManager
                 ->getRepository(User::class)
-                ->findOneBy([ User::EMAIL_ATTR => $postData[User::EMAIL_ATTR] ]);
+                ->findOneBy([ 'id' => $postData[Result::USER_ATTR] ]);
 
-            if ($user_exist instanceof User) {    // 400 - Bad Request
+            if (!($user_exist instanceof User)) {    // 400 - Bad Request
                 return Utils::errorMessage(Response::HTTP_BAD_REQUEST, null, $format);
             }
-            $user->setEmail($postData[User::EMAIL_ATTR]);
+            $result->setUser($user_exist);
         }
 
-        // password
-        if (isset($postData[User::PASSWD_ATTR])) {
-            // hash the password (based on the security.yaml config for the $user class)
-            $hashedPassword = $this->passwordHasher->hashPassword(
-                $user,
-                $postData[User::PASSWD_ATTR]
-            );
-            $user->setPassword($hashedPassword);
+        // result value
+        if (isset($postData[Result::RESULT_ATTR])) {
+            $result->setResult($postData[Result::RESULT_ATTR]);
         }
 
-        // roles
-        if (isset($postData[User::ROLES_ATTR])) {
-            if (
-                in_array(self::ROLE_ADMIN, $postData[User::ROLES_ATTR], true)
-                && !$this->isGranted(self::ROLE_ADMIN)
-            ) {
-                return Utils::errorMessage( // 403
-                    Response::HTTP_FORBIDDEN,
-                    '`Forbidden`: you don\'t have permission to access',
-                    $format
-                );
-            }
-            $user->setRoles($postData[User::ROLES_ATTR]);
+        // date value
+        if (isset($postData[Result::DATE_ATTR])) {
+            $result->setDate(new \DateTime($postData[Result::DATE_ATTR]));
         }
 
         $this->entityManager->flush();
 
         return Utils::apiResponse(
             209,                        // 209 - Content Returned
-            [ User::USER_ATTR => $user ],
+            [ Result::RESULT_ATTR => $result ],
             $format
         );
     }
