@@ -371,6 +371,32 @@ paths:
           headers:
             Allow:
               $ref: '#/components/headers/Allow'
+  '/results/bigger/{result}':
+    get:
+      tags: [ '🔢 Results' ]
+      summary: the list of results with more that a specified result
+      description: 'the list of results with more that a specified `result`'
+      operationId: api_results_bigger
+      parameters:
+        - $ref: '#/components/parameters/result'
+      security:
+        - MiWApiSecurity: [ ]
+      responses:
+        '200':
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '401':
+          $ref: '#/components/responses/401_Unauthorized_Response'
+        '403':
+          $ref: '#/components/responses/403_Forbidden_Response'
+        '404':
+          $ref: '#/components/responses/404_Resource_Not_Found_Response'
 components:
   headers:
     ETag:
@@ -622,6 +648,12 @@ components:
       name: resultId
       in: path
       description: 'ID of result'
+      required: true
+      schema: { "type": "integer", pattern: '^\d+$' }
+    result:
+      name: result
+      in: path
+      description: 'Result value'
       required: true
       schema: { "type": "integer", pattern: '^\d+$' }
     ifMatchParam:

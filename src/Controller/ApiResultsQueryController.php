@@ -173,4 +173,62 @@ class ApiResultsQueryController extends AbstractController implements ApiResults
             ]
         );
     }
+
+    /**
+     * @see ApiResultsQueryInterface::biggerAction()
+     *
+     * @Route(
+     *     path="/bigger/{result}.{_format}",
+     *     defaults={ "_format": null },
+     *     requirements={
+     *          "result": "\d+",
+     *          "_format": "json|xml"
+     *     },
+     *     methods={ Request::METHOD_GET },
+     *     name="bigger"
+     * )
+     *
+     * @throws JsonException
+     */
+    public function biggerAction(Request $request, int $result): Response
+    {
+        $format = Utils::getFormat($request);
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return Utils::errorMessage( // 401
+                Response::HTTP_UNAUTHORIZED,
+                '`Unauthorized`: Invalid credentials.',
+                $format
+            );
+        }
+
+        $results = $this->entityManager
+            ->getRepository(Result::class)
+            ->createQueryBuilder('r')
+            ->where('r.result > :result')
+            ->setParameter('result', $result)
+            ->getQuery()
+            ->getResult();
+
+        // @codeCoverageIgnoreStart
+        if (empty($results)) {
+            return Utils::errorMessage(Response::HTTP_NOT_FOUND, null, $format);    // 404
+        }
+        // @codeCoverageIgnoreEnd
+
+        // Caching with ETag
+        $etag = md5((string) json_encode($results, JSON_THROW_ON_ERROR));
+        if (($etags = $request->getETags()) && (in_array($etag, $etags) || in_array('*', $etags))) {
+            return new Response(null, Response::HTTP_NOT_MODIFIED); // 304
+        }
+
+        return Utils::apiResponse(
+            Response::HTTP_OK,
+            [ 'results' => array_map(fn ($r) =>  ['result' => $r], $results) ],
+            $format,
+            [
+                self::HEADER_CACHE_CONTROL => 'private',
+                self::HEADER_ETAG => $etag,
+            ]
+        );
+    }
 }

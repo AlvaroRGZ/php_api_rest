@@ -39,4 +39,13 @@ interface ApiResultsQueryInterface
      * @param  int|null $resultId Result id
      */
     public function optionsAction(?int $resultId): Response;
+
+    /**
+     * **bigger** Action<br>
+     * Summary: Provides the list of results with more that $result result<br>
+     * _Notes_: Returns results from the system that the user has access to.
+     *
+     * @param  int $result Result
+     */
+    public function biggerAction(Request $request, int $result): Response;
 }
