@@ -231,4 +231,57 @@ class ApiResultsQueryController extends AbstractController implements ApiResults
             ]
         );
     }
+
+    /**
+     * @see ApiResultsQueryInterface::numberAction()
+     *
+     * @Route(
+     *     path="/number/.{_format}",
+     *     defaults={ "_format": null },
+     *     requirements={
+     *          "_format": "json|xml"
+     *     },
+     *     methods={ Request::METHOD_GET },
+     *     name="number"
+     * )
+     *
+     * @throws JsonException
+     */
+    public function numberAction(Request $request): Response
+    {
+        $format = Utils::getFormat($request);
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return Utils::errorMessage( // 401
+                Response::HTTP_UNAUTHORIZED,
+                '`Unauthorized`: Invalid credentials.',
+                $format
+            );
+        }
+
+        $results = $this->entityManager
+            ->getRepository(Result::class)
+            ->findBy([]);
+
+        // @codeCoverageIgnoreStart
+        if (empty($results)) {
+            return Utils::errorMessage(Response::HTTP_NOT_FOUND, null, $format);    // 404
+        }
+        // @codeCoverageIgnoreEnd
+
+        // Caching with ETag
+        $etag = md5((string) json_encode($results, JSON_THROW_ON_ERROR));
+        if (($etags = $request->getETags()) && (in_array($etag, $etags) || in_array('*', $etags))) {
+            return new Response(null, Response::HTTP_NOT_MODIFIED); // 304
+        }
+
+        return Utils::apiResponse(
+            Response::HTTP_OK,
+            [ 'number' => sizeof($results) ],
+            $format,
+            [
+                self::HEADER_CACHE_CONTROL => 'private',
+                self::HEADER_ETAG => $etag,
+            ]
+        );
+    }
 }

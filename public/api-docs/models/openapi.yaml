@@ -397,6 +397,30 @@ paths:
           $ref: '#/components/responses/403_Forbidden_Response'
         '404':
           $ref: '#/components/responses/404_Resource_Not_Found_Response'
+  '/results/number':
+    get:
+      tags: [ '🔢 Results' ]
+      summary: the number of results
+      description: 'the number of results'
+      operationId: api_results_number
+      security:
+        - MiWApiSecurity: [ ]
+      responses:
+        '200':
+          description: Number of results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '401':
+          $ref: '#/components/responses/401_Unauthorized_Response'
+        '403':
+          $ref: '#/components/responses/403_Forbidden_Response'
+        '404':
+          $ref: '#/components/responses/404_Resource_Not_Found_Response'
 components:
   headers:
     ETag:
@@ -490,6 +514,13 @@ components:
                   href: /api/v1/users/1508
           result: 450
           date: 2013-06-23
+    Number:
+      type: object
+      properties:
+        number:
+          description: 'Number of results'
+          type: integer
+          format: int64
     Message:
       type: object
       description: HTTP response message

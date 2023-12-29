@@ -48,4 +48,11 @@ interface ApiResultsQueryInterface
      * @param  int $result Result
      */
     public function biggerAction(Request $request, int $result): Response;
+
+    /**
+     * **number** Action<br>
+     * Summary: Retrieves the number of Results resources.<br>
+     * _Notes_: Returns number of results from the system that the user has access to.
+     */
+    public function numberAction(Request $request): Response;
 }
