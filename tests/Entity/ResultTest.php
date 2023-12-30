@@ -106,11 +106,14 @@ class ResultTest extends TestCase
      */
     public function testGetSetUser(): void
     {
-        $resultDate = new DateTime('@' . self::$faker->unixTime());
-        self::$result->setDate($resultDate);
+        self::assertInstanceOf(User::class, self::$result->getUser());
         self::assertSame(
-            $resultDate,
-            self::$result->getDate()
+            "test@example.com",
+            self::$result->getUser()->getEmail()
+        );
+        self::assertSame(
+            "password",
+            self::$result->getUser()->getPassword()
         );
     }
 }
