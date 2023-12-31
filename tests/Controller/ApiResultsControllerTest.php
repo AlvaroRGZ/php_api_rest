@@ -124,13 +124,13 @@ class ApiResultsControllerTest extends BaseTestCase
     }
 
     /**
-     * Test GET /users 200 Ok
+     * Test GET /results 200 Ok
      *
-     * @depends testPostUserAction201Created
+     * @depends testPostResultAction201Created
      *
      * @return string ETag header
      */
-    public function testCGetUserAction200Ok(): string
+    public function testCGetResultAction200Ok(): string
     {
         self::$client->request(Request::METHOD_GET, self::RUTA_API, [], [], self::$adminHeaders);
         $response = self::$client->getResponse();
@@ -138,20 +138,20 @@ class ApiResultsControllerTest extends BaseTestCase
         self::assertNotNull($response->getEtag());
         $r_body = strval($response->getContent());
         self::assertJson($r_body);
-        $users = json_decode($r_body, true);
-        self::assertArrayHasKey('users', $users);
+        $results = json_decode($r_body, true);
+        self::assertArrayHasKey('results', $results);
 
         return (string) $response->getEtag();
     }
 
     /**
-     * Test GET /users 304 NOT MODIFIED
+     * Test GET /results 304 NOT MODIFIED
      *
-     * @param string $etag returned by testCGetUserAction200Ok
+     * @param string $etag returned by testCGetResultAction200Ok
      *
-     * @depends testCGetUserAction200Ok
+     * @depends testCGetResultAction200Ok
      */
-    public function testCGetUserAction304NotModified(string $etag): void
+    public function testCGetResultAction304NotModified(string $etag): void
     {
         $headers = array_merge(
             self::$adminHeaders,
@@ -169,17 +169,17 @@ class ApiResultsControllerTest extends BaseTestCase
     }
 
     /**
-     * Test GET /users 200 Ok (with XML header)
+     * Test GET /results 200 Ok (with XML header)
      *
-     * @param   array<string,string> $user user returned by testPostUserAction201()
+     * @param   array<string,string> $result result returned by testPostResultAction201()
      * @return  void
-     * @depends testPostUserAction201Created
+     * @depends testPostResultAction201Created
      */
-    public function testCGetUserAction200XmlOk(array $user): void
+    public function testCGetResultAction200XmlOk(array $result): void
     {
         self::$client->request(
             Request::METHOD_GET,
-            self::RUTA_API . '/' . $user['id'],
+            self::RUTA_API . '/' . $result['id'],
             [],
             [],
             array_merge(
