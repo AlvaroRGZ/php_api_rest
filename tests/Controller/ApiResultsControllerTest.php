@@ -463,7 +463,7 @@ class ApiResultsControllerTest extends BaseTestCase
         $this->checkResponseErrorMessage($response, Response::HTTP_PRECONDITION_FAILED);
     }
     */
-    // #################### TO FIX
+
     /**
      * Test DELETE /results/{resultId} 204 No Content
      *

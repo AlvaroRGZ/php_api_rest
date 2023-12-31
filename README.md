@@ -4,6 +4,30 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%5E8.1-blue.svg)](http://php.net/)
 [![PHPUnit Tests](https://github.com/FJavierGil/miw-api-usuarios/actions/workflows/php.yml/badge.svg)](https://github.com/FJavierGil/miw-api-usuarios/actions/workflows/php.yml)
+
+## Logros de la práctica
+Se ha implementado el modelo de resultado con el ORM `Doctrine` y la aplicación web con `swagger` y el 
+potentísimo framework de [Symfony](https://symfony.com/) con todas las operaciones demandadas en la práctica.
+
+![img](assets/swagger_result.png)
+
+Con dos operaciones añadidas:
+* `GET` **/results/bigger** : solicita un valor y devuelve la lista de resultados que tienen un valor mayor.
+* `GET` **/results/number** : devuelve el numero de resultados registrados.
+
+Cada `Resultado` almacena el usuario que lo registró, junto a su fecha y valor.
+
+Se han implementado las pruebas adaptadas a la entidad `Result` y a las funcionalidades de la API que trabajan
+con ellos, a continuacción se presentan las imagenes del resultado de la ejecucion de las pruebas con:
+
+> php bin/phpunit  --testdox
+
+![img](assets/test_all_passing.jpg)
+![img](assets/entity_tests_passing.jpg)
+![img](assets/tests_passing_confirm.jpg)
+
+El resultado de cubrimiento de código se puede ver en `/var/coverage`.
+
 > 🎯 Implementación de una API REST con el framework Symfony para la gestión de usuarios y resultados.
 
 Esta aplicación implementa una interfaz de programación [REST][rest] desarrollada como ejemplo de
