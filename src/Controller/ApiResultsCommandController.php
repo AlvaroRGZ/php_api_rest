@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Result;
 use App\Entity\User;
 use App\Utility\Utils;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -232,7 +233,7 @@ class ApiResultsCommandController extends AbstractController implements ApiResul
 
         // date value
         if (isset($postData[Result::DATE_ATTR])) {
-            $result->setDate(new \DateTime($postData[Result::DATE_ATTR]));
+            $result->setDate(new DateTime($postData[Result::DATE_ATTR]));
         }
 
         $this->entityManager->flush();

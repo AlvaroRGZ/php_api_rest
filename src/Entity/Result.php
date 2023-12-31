@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * )
  */
 #[ORM\Entity, ORM\Table(name: "results")]
-#[ORM\UniqueConstraint(name: "IDX_UNIQ_DATE", columns: [ "date" ])]
+//#[ORM\UniqueConstraint(name: "IDX_UNIQ_DATE", columns: [ "date" ])]
 #[Serializer\XmlNamespace(uri: "http://www.w3.org/2005/Atom", prefix: "atom")]
 #[Serializer\AccessorOrder(order: 'custom', custom: [ "id", "user", "result", "date" ]) ]
 class Result implements JsonSerializable
@@ -64,7 +64,7 @@ class Result implements JsonSerializable
         type: "datetime",
         nullable: false
     )]
-    #[Serializer\Exclude]
+    // #[Serializer\Exclude]
     protected DateTime $date;
 
     /**
