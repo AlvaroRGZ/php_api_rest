@@ -26,6 +26,9 @@ con ellos, a continuacción se presentan las imagenes del resultado de la ejecuc
 ![img](assets/entity_tests_passing.jpg)
 ![img](assets/tests_passing_confirm.jpg)
 
+He de comentar que no he conseguido controlar el flujo de ejecución de algunos tests, por lo que hay dos test,
+dependientes de la creación y borrado de resultados, que a veces funcionan y otras no.
+
 El resultado de cubrimiento de código se puede ver en `/var/coverage`.
 
 > 🎯 Implementación de una API REST con el framework Symfony para la gestión de usuarios y resultados.
