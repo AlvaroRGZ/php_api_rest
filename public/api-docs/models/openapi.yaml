@@ -520,7 +520,7 @@ components:
         number:
           description: 'Number of results'
           type: integer
-          format: int64
+          example: 0
     Message:
       type: object
       description: HTTP response message
